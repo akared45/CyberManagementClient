@@ -1,0 +1,37 @@
+/* Nền chung */
+.root {
+    -fx-background-color: #f0f8ff; /* Màu sáng hơn */
+}
+
+/* Phần nhãn (Label) */
+.label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333; /* Màu chữ tối hơn */
+}
+
+/* Nút (Button) */
+.button {
+    -fx-font-size: 14px;
+    -fx-background-color: #4CAF50; /* Màu xanh lá cây */
+    -fx-text-fill: white; /* Màu chữ trắng */
+    -fx-background-radius: 5px; /* Bo tròn góc */
+    -fx-padding: 10 20; /* Kích thước nút lớn hơn */
+}
+
+.button:hover {
+    -fx-background-color: #45a049; /* Đổi màu khi hover */
+}
+
+/* Thanh tiến trình (ProgressBar) */
+.progress-bar {
+    -fx-accent: #1e90ff; /* Màu xanh nước biển cho thanh tiến trình */
+}
+
+/* Quảng cáo */
+.ad-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: orange;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}

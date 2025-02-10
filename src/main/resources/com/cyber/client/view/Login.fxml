@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.cyber.client.controller.LoginController"
+      stylesheets="@../style/Login.css"
+      spacing="20"
+      fx:id="rootHBox"
+      alignment="CENTER"> <!-- Thêm fx:id vào HBox cha -->
+
+    <!-- Khu vực hình ảnh -->
+    <StackPane styleClass="image-container" HBox.hgrow="ALWAYS">
+        <ImageView fx:id="loginImage" preserveRatio="true" fitHeight="750"/>
+    </StackPane>
+
+    <StackPane fx:id="formContainer">
+        <!-- Form Login -->
+        <VBox fx:id="loginVBox" alignment="CENTER" spacing="20" visible="true">
+            <Label text="Cyber Management" styleClass="title-label"/>
+            <GridPane fx:id="gridPaneLogin" hgap="15" vgap="15" alignment="CENTER">
+                <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <PasswordField fx:id="passwordField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <HBox spacing="15" alignment="CENTER" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                    <Button text="Login" onAction="#handleLogin"/>
+                    <Button text="Register" onAction="#switchToRegister"/>
+                </HBox>
+            </GridPane>
+        </VBox>
+
+        <!-- Form Register (Ẩn ban đầu) -->
+        <VBox fx:id="registerVBox" alignment="CENTER" spacing="20" visible="false">
+            <Label text="Register Account" styleClass="title-label"/>
+            <GridPane fx:id="gridPaneRegister" hgap="15" vgap="15" alignment="CENTER">
+                <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="registerUsernameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <PasswordField fx:id="registerPasswordField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <HBox spacing="15" alignment="CENTER" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                    <Button text="Back to Login" onAction="#handleBackToLogin"/>
+                    <Button text="Register"/>
+                </HBox>
+            </GridPane>
+        </VBox>
+    </StackPane>
+
+
+</HBox>
