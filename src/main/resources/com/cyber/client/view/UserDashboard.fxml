@@ -14,16 +14,14 @@
             <children>
                 <Label layoutX="30.0" layoutY="15.0"
                        style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Tên:"/>
-                <Label layoutX="110.0" layoutY="15.0" style="-fx-font-size: 18px; -fx-text-fill: white;" text="Vinh"/>
+                <Label fx:id="lblName" layoutX="110.0" layoutY="15.0" style="-fx-font-size: 18px; -fx-text-fill: white;" />
                 <Label layoutX="30.0" layoutY="45.0"
                        style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Sử dụng:"/>
-                <Text layoutX="110.0" layoutY="64.0" style="-fx-font-size: 18px; -fx-text-fill: white;"
-                      text="0:00 / 0"/>
+                <Text fx:id="txtUsage" layoutX="110.0" layoutY="64.0" style="-fx-font-size: 18px; -fx-text-fill: white;"/>
                 <Label layoutX="30.0" layoutY="75.0"
                        style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Còn lại:"/>
-                <Text layoutX="110.0" layoutY="94.0" style="-fx-font-size: 18px; -fx-text-fill: white;"
-                      text="2:00 / 20,000"/>
-                <ProgressBar layoutX="30.0" layoutY="126.0" prefWidth="290.0" progress="0.57"
+                <Text fx:id="txtRemaining" layoutX="110.0" layoutY="94.0" style="-fx-font-size: 18px; -fx-text-fill: white;"/>
+                <ProgressBar fx:id="progressBar" layoutX="30.0" layoutY="126.0" prefWidth="290.0" progress="0.57"
                              style="-fx-accent: #FFC107;"/>
             </children>
         </AnchorPane>

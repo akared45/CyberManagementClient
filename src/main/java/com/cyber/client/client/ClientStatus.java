@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
 import java.io.BufferedReader;
@@ -12,11 +13,11 @@ import java.net.Socket;
 
 public class ClientStatus {
     public static void sendOnlineStatus() {
-        ClientManager.sendStatus("ONLINE");
+        ClientManager.sendMessage("ONLINE");
     }
 
     public static void sendOfflineStatus() {
-        ClientManager.sendStatus("OFFLINE");
+        ClientManager.sendMessage("OFFLINE");
     }
 
     public static void startListeningForLockCommand(Stage primaryStage) {
@@ -45,6 +46,8 @@ public class ClientStatus {
                                 primaryStage.setScene(scene);
                                 primaryStage.setMaximized(true);
                                 primaryStage.setTitle("Login");
+                                primaryStage.setFullScreen(true);
+                                primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
                                 primaryStage.show();
                             } catch (Exception e) {
                                 e.printStackTrace();

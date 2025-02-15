@@ -1,5 +1,6 @@
 package com.cyber.client.controller;
 
+import com.cyber.client.client.ClientManager;
 import com.cyber.client.client.ClientStatus;
 import com.cyber.client.database.DatabaseConnection;
 import com.cyber.client.model.User;
@@ -16,11 +17,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class LoginController {
@@ -42,7 +38,6 @@ public class LoginController {
     @FXML
     private VBox registerVBox;
 
-    private User loggedInUser;
     @FXML
     public void initialize() {
         loginImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/com/cyber/client/assets/navi.jpg")).toExternalForm()));
@@ -59,8 +54,8 @@ public class LoginController {
         registerVBox.setVisible(false);
         loginVBox.setVisible(true);
     }
-
-    public void handleLogin() {
+    @FXML
+    private void handleLogin() {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
@@ -68,25 +63,39 @@ public class LoginController {
             showAlert(Alert.AlertType.ERROR, "Error", "Please enter both username and password!");
             return;
         }
-        if (validateLogin(username, password)) {
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Login successful!");
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cyber/client/view/UserDashboard.fxml"));
-                Parent root = fxmlLoader.load();
-                UserDashboardController dashboardController = fxmlLoader.getController();
-                dashboardController.setUser(loggedInUser);
-                Stage stage = getStage(root);
-                stage.show();
-                ClientStatus.startListeningForLockCommand(stage);
-            } catch (Exception e) {
-                e.printStackTrace();
-                showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the user dashboard!");
+        String loginMessage = "LOGIN:" + username + ":" + password;
+        String response = ClientManager.sendMessage(loginMessage);
+
+        if (response != null && response.startsWith("LOGIN_SUCCESS:"))  {
+            String[] parts = response.split(":");
+            if (parts.length == 3) {
+                showAlert(Alert.AlertType.INFORMATION, "Success",
+                        "Login successful!");
+                String loggedInUsername = parts[1];
+                double balance = Double.parseDouble(parts[2]);
+                User loggedInUser=new User(loggedInUsername,balance);
+                loadDashboard(loggedInUser);
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Invalid response from server!");
             }
         } else {
             showAlert(Alert.AlertType.ERROR, "Error", "Incorrect username or password!");
         }
     }
 
+    private void loadDashboard(User loggedInUser) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cyber/client/view/UserDashboard.fxml"));
+            Parent root = fxmlLoader.load();
+            UserDashboardController userDashboardController = fxmlLoader.getController();
+            userDashboardController.setUser(loggedInUser);
+            Stage stage = getStage(root);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the user dashboard!");
+        }
+    }
     private Stage getStage(Parent root) {
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         double windowWidth = screenBounds.getWidth() * 0.3;
@@ -103,32 +112,6 @@ public class LoginController {
         stage.setTitle("User Dashboard");
         return stage;
     }
-
-    private boolean validateLogin(String username, String password) {
-        String query = "SELECT * FROM users WHERE username = ? AND password = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                int id = resultSet.getInt("user_id");
-                String name = resultSet.getString("username");
-                String userPassword = resultSet.getString("password");
-                double balance = resultSet.getDouble("balance");
-                LocalDateTime created = resultSet.getTimestamp("create_date").toLocalDateTime();
-
-                loggedInUser = new User(id, name, userPassword, balance, created);
-                return true;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Cannot connect to the database!");
-        }
-        return false;
-    }
-
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);

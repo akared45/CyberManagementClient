@@ -12,6 +12,11 @@ public class User {
     public User() {
     }
 
+    public User(String name, double balance) {
+        this.name = name;
+        this.balance = balance;
+    }
+
     public User(int id, String name, String password, double balance, LocalDateTime created) {
         this.id = id;
         this.name = name;
