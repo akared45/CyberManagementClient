@@ -14,9 +14,9 @@ import java.util.Objects;
 public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        new Thread(ClientStatus::sendOnlineStatus).start();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cyber/client/view/Food.fxml"));
+        new Thread(ClientStatus::sendOnlineStatus).start();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cyber/client/view/Login.fxml"));
         Image logo = new Image(Objects.requireNonNull(getClass().getResource("/com/cyber/client/assets/logo.jpg")).toExternalForm());
         Scene scene = new Scene(fxmlLoader.load());
         stage.getIcons().add(logo);

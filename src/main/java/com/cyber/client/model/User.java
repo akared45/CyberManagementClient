@@ -12,7 +12,8 @@ public class User {
     public User() {
     }
 
-    public User(String name, double balance) {
+    public User(int id,String name, double balance) {
+        this.id = id;
         this.name = name;
         this.balance = balance;
     }

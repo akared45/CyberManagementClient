@@ -2,8 +2,8 @@ package com.cyber.client.controller;
 
 import com.cyber.client.client.ClientManager;
 import com.cyber.client.client.ClientStatus;
-import com.cyber.client.database.DatabaseConnection;
 import com.cyber.client.model.User;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
 import java.util.Objects;
 
 public class LoginController {
@@ -38,6 +39,8 @@ public class LoginController {
     @FXML
     private VBox registerVBox;
 
+    private User loggedInUser;
+
     @FXML
     public void initialize() {
         loginImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/com/cyber/client/assets/navi.jpg")).toExternalForm()));
@@ -54,6 +57,7 @@ public class LoginController {
         registerVBox.setVisible(false);
         loginVBox.setVisible(true);
     }
+
     @FXML
     private void handleLogin() {
         String username = usernameField.getText();
@@ -63,18 +67,19 @@ public class LoginController {
             showAlert(Alert.AlertType.ERROR, "Error", "Please enter both username and password!");
             return;
         }
+
         String loginMessage = "LOGIN:" + username + ":" + password;
         String response = ClientManager.sendMessage(loginMessage);
 
-        if (response != null && response.startsWith("LOGIN_SUCCESS:"))  {
+        if (response != null && response.startsWith("LOGIN_SUCCESS:")) {
             String[] parts = response.split(":");
-            if (parts.length == 3) {
-                showAlert(Alert.AlertType.INFORMATION, "Success",
-                        "Login successful!");
-                String loggedInUsername = parts[1];
-                double balance = Double.parseDouble(parts[2]);
-                User loggedInUser=new User(loggedInUsername,balance);
-                loadDashboard(loggedInUser);
+            if (parts.length == 4) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Login successful!");
+                int id= Integer.parseInt(parts[1]);
+                String loggedInUsername = parts[2];
+                double balance = Double.parseDouble(parts[3]);
+                loggedInUser = new User(id,loggedInUsername, balance);
+                loadDashboard();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Invalid response from server!");
             }
@@ -83,7 +88,7 @@ public class LoginController {
         }
     }
 
-    private void loadDashboard(User loggedInUser) {
+    private void loadDashboard() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cyber/client/view/UserDashboard.fxml"));
             Parent root = fxmlLoader.load();
@@ -96,6 +101,7 @@ public class LoginController {
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the user dashboard!");
         }
     }
+
     private Stage getStage(Parent root) {
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         double windowWidth = screenBounds.getWidth() * 0.3;
@@ -109,9 +115,9 @@ public class LoginController {
         stage.setTitle("User Dashboard");
         stage.setX(screenBounds.getMaxX() - windowWidth);
         stage.setY(0);
-        stage.setTitle("User Dashboard");
         return stage;
     }
+
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);

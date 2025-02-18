@@ -21,7 +21,7 @@ public class ItemController {
 
     @FXML
     private void click(MouseEvent mouseEvent) {
-        foodController.onFruitClicked(food);
+        foodController.onFoodClicked(food);
     }
 
     public void setData(Food food, FoodController foodController) {
