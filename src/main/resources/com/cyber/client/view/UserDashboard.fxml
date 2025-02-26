@@ -13,14 +13,14 @@
                     style="-fx-background-color: linear-gradient(to right, #2196F3, #03A9F4); -fx-padding: 15; -fx-border-radius: 10;">
             <children>
                 <Label layoutX="30.0" layoutY="15.0"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Tên:"/>
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="UserName:"/>
                 <Label fx:id="lblName" layoutX="110.0" layoutY="15.0" style="-fx-font-size: 18px; -fx-text-fill: white;" />
                 <Label layoutX="30.0" layoutY="45.0"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Sử dụng:"/>
-                <Text fx:id="txtUsage" layoutX="110.0" layoutY="64.0" style="-fx-font-size: 18px; -fx-text-fill: white;"/>
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Time of use:"/>
+                <Text fx:id="txtUsage" layoutX="200.0" layoutY="64.0" style="-fx-font-size: 18px; -fx-text-fill: white;"/>
                 <Label layoutX="30.0" layoutY="75.0"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Còn lại:"/>
-                <Text fx:id="txtRemaining" layoutX="110.0" layoutY="94.0" style="-fx-font-size: 18px; -fx-text-fill: white;"/>
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="Time remaining:"/>
+                <Text fx:id="txtRemaining" layoutX="200.0" layoutY="94.0" style="-fx-font-size: 18px; -fx-text-fill: white;"/>
                 <ProgressBar fx:id="progressBar" layoutX="30.0" layoutY="126.0" prefWidth="290.0" progress="0.57"
                              style="-fx-accent: #FFC107;"/>
             </children>
@@ -33,23 +33,19 @@
             <children>
                 <Button prefHeight="55.0" prefWidth="140.0"
                         style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 20;"
-                        text="Đồ ăn" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                        text="Food" GridPane.columnIndex="0" GridPane.rowIndex="0"
                         onAction="#handleFood"/>
                 <Button prefHeight="55.0" prefWidth="140.0"
                         style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 20;"
-                        text="Dịch vụ" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        text="Deposit" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                        onAction="#handleBalance"/>
                 <Button prefHeight="55.0" prefWidth="140.0"
                         style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 20;"
-                        text="Dịch vụ" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        text="Logout" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                        onAction="#Logout" fx:id="logoutButton"/>
                 <Button prefHeight="55.0" prefWidth="140.0"
                         style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 20;"
-                        text="Dịch vụ" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Button prefHeight="55.0" prefWidth="140.0"
-                        style="-fx-background-color: #673AB7; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 20;"
-                        text="Dịch vụ" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <Button prefHeight="55.0" prefWidth="140.0"
-                        style="-fx-background-color: #673AB7; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 20;"
-                        text="Dịch vụ" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        text="Chat(Comingsoon)" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
             </children>
             <columnConstraints>
                 <ColumnConstraints/>
@@ -62,7 +58,6 @@
             </rowConstraints>
         </GridPane>
     </center>
-
     <bottom>
         <ImageView fitHeight="296.0" fitWidth="350.0" pickOnBounds="true" preserveRatio="true"
                    BorderPane.alignment="CENTER">

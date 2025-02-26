@@ -8,9 +8,8 @@
       stylesheets="@../style/Login.css"
       spacing="20"
       fx:id="rootHBox"
-      alignment="CENTER"> <!-- Thêm fx:id vào HBox cha -->
+      alignment="CENTER">
 
-    <!-- Khu vực hình ảnh -->
     <StackPane styleClass="image-container" HBox.hgrow="ALWAYS">
         <ImageView fx:id="loginImage" preserveRatio="true" fitHeight="750"/>
     </StackPane>
@@ -33,7 +32,6 @@
             </GridPane>
         </VBox>
 
-        <!-- Form Register (Ẩn ban đầu) -->
         <VBox fx:id="registerVBox" alignment="CENTER" spacing="20" visible="false">
             <Label text="Register Account" styleClass="title-label"/>
             <GridPane fx:id="gridPaneRegister" hgap="15" vgap="15" alignment="CENTER">
@@ -45,7 +43,7 @@
 
                 <HBox spacing="15" alignment="CENTER" GridPane.rowIndex="2" GridPane.columnIndex="1">
                     <Button text="Back to Login" onAction="#handleBackToLogin"/>
-                    <Button text="Register"/>
+                    <Button text="Register" onAction="#handleRegister"/>
                 </HBox>
             </GridPane>
         </VBox>

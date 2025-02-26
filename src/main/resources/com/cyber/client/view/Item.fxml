@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import java.lang.String?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" onMousePressed="#click" stylesheets="@../style/Food.css"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" onMousePressed="#click"
             xmlns="http://javafx.com/javafx/8.0.171" fx:controller="com.cyber.client.controller.ItemController">
     <children>
         <VBox alignment="TOP_CENTER" layoutX="63.0" layoutY="8.0" prefHeight="215.0" prefWidth="225.0"
@@ -34,13 +34,9 @@
                         <Insets left="20.0" top="10.0"/>
                     </VBox.margin>
                 </HBox>
-
                 <ImageView fx:id="img" fitHeight="115.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@../assets/cherry.png"/>
-                    </image>
-                </ImageView>
 
+                </ImageView>
             </children>
         </VBox>
     </children>

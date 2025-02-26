@@ -2,8 +2,8 @@ package com.cyber.client.controller;
 
 import com.cyber.client.client.ClientManager;
 import com.cyber.client.client.ClientStatus;
+import com.cyber.client.database.DatabaseConnection;
 import com.cyber.client.model.User;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -18,6 +18,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class LoginController {
@@ -42,6 +45,12 @@ public class LoginController {
     private User loggedInUser;
 
     @FXML
+    private TextField registerUsernameField;
+
+    @FXML
+    private TextField registerPasswordField;
+
+    @FXML
     public void initialize() {
         loginImage.setImage(new Image(Objects.requireNonNull(getClass().getResource("/com/cyber/client/assets/navi.jpg")).toExternalForm()));
     }
@@ -62,29 +71,70 @@ public class LoginController {
     private void handleLogin() {
         String username = usernameField.getText();
         String password = passwordField.getText();
-
         if (username.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "Please enter both username and password!");
             return;
         }
-
         String loginMessage = "LOGIN:" + username + ":" + password;
         String response = ClientManager.sendMessage(loginMessage);
-
         if (response != null && response.startsWith("LOGIN_SUCCESS:")) {
             String[] parts = response.split(":");
-            if (parts.length == 4) {
+            if (parts.length == 5) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Login successful!");
                 int id= Integer.parseInt(parts[1]);
                 String loggedInUsername = parts[2];
                 double balance = Double.parseDouble(parts[3]);
+                int computerId = Integer.parseInt(parts[4]);
+                new Thread(ClientStatus::sendOnlineStatus).start();
                 loggedInUser = new User(id,loggedInUsername, balance);
+                insertSession(computerId, id);
                 loadDashboard();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Invalid response from server!");
             }
         } else {
             showAlert(Alert.AlertType.ERROR, "Error", "Incorrect username or password!");
+        }
+    }
+
+    @FXML
+    private void handleRegister() {
+        String username = registerUsernameField.getText();
+        String password = registerPasswordField.getText();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Please enter both username and password!");
+            return;
+        }
+
+        String registerMessage = "REGISTER:" + username + ":" + password;
+        String response = ClientManager.sendMessage(registerMessage);
+
+        if (response != null) {
+            if (response.equals("REGISTER_SUCCESS")) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Registration successful! You can now log in.");
+                handleBackToLogin();
+            } else if (response.equals("USERNAME_TAKEN")) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Username is already taken!");
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Registration failed. Please try again!");
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Error", "No response from server. Please try again later!");
+        }
+    }
+    private void insertSession(int computerId, int userId) {
+        String sql = "INSERT INTO sessions (computer_id, user_id, start_time, end_time, total_time, session_cost) " +
+                "VALUES (?, ?, NOW(), NULL, NULL, NULL)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, computerId);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+            System.out.println("✅ Session started: Machine " + computerId + ", User " + userId);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -95,6 +145,9 @@ public class LoginController {
             UserDashboardController userDashboardController = fxmlLoader.getController();
             userDashboardController.setUser(loggedInUser);
             Stage stage = getStage(root);
+            stage.setOnCloseRequest(event -> {
+                ClientStatus.sendOfflineStatus();
+            });
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();

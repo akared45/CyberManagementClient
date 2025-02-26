@@ -9,14 +9,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -29,7 +27,8 @@ public class FoodController implements Initializable {
     private static final String DEFAULT_IMAGE_PATH = "/com/cyber/client/assets/kiwi.png";
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-
+    @FXML private TextField searchField;
+    @FXML private Label userAccount;
     @FXML private VBox chosenFoodCard;
     @FXML private Label foodNameLabel;
     @FXML private Label foodPriceLabel;
@@ -46,7 +45,7 @@ public class FoodController implements Initializable {
 
     public void setUser(User user) {
         this.loggedInUser = user;
-        System.out.println("User được truyền vào: " + loggedInUser.getName());
+        userAccount.setText(loggedInUser.getName());
     }
 
     @Override
@@ -56,7 +55,7 @@ public class FoodController implements Initializable {
         if (!foods.isEmpty()) {
             setChosenFood(foods.getFirst());
         }
-        populateFoodGrid();
+        populateFoodGrid(foods);
     }
 
     private void initializeSpinner() {
@@ -87,11 +86,13 @@ public class FoodController implements Initializable {
         }
     }
 
-    private void populateFoodGrid() {
+    private void populateFoodGrid(List<Food> foodsToDisplay) {
+
+        grid.getChildren().clear();
         int column = 0;
         int row = 1;
         try {
-            for (Food food : foods) {
+            for (Food food : foodsToDisplay) {
                 FXMLLoader fxmlLoader = new FXMLLoader();
                 fxmlLoader.setLocation(getClass().getResource("/com/cyber/client/view/Item.fxml"));
                 AnchorPane anchorPane = fxmlLoader.load();
@@ -133,8 +134,11 @@ public class FoodController implements Initializable {
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             if (imageUrl.startsWith("http") || imageUrl.startsWith("https")) {
                 return new Image(imageUrl);
-            } else if (imageUrl.startsWith("file:/")) {
-                return new Image(imageUrl);
+            } else {
+                File file = new File(imageUrl);
+                if (file.exists()) {
+                    return new Image(file.toURI().toString());
+                }
             }
         }
         return new Image(Objects.requireNonNull(FoodController.class.getResourceAsStream(DEFAULT_IMAGE_PATH)));
@@ -158,7 +162,6 @@ public class FoodController implements Initializable {
         return label;
     }
 
-
     private Button createRemoveButton(Label itemLabel, double itemTotal) {
         Button removeButton = new Button();
         ImageView trashIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/cyber/client/assets/trash.jpg"))));
@@ -181,16 +184,21 @@ public class FoodController implements Initializable {
     @FXML
     public void handleCheckOut() {
         if (paymentItems.getChildren().isEmpty()) {
-            System.out.println("There are no items in the cart.");
+            showAlert(Alert.AlertType.ERROR, "Checkout Failed", "Your cart is empty.");
             return;
         }
         if (loggedInUser == null) {
-            System.out.println("Not logged in. Cannot place order.");
+            showAlert(Alert.AlertType.ERROR, "Login Required", "You need to log in to place an order.");
             return;
         }
+        if (!checkStockAvailability()) {
+            return;
+        }
+
         Map<Food, Integer> orderedFoods = extractOrderedFoods();
         double totalAmount = calculateTotalAmount(orderedFoods);
         int orderId = insertOrderIntoDatabase(totalAmount);
+
         if (orderId != -1) {
             insertOrderDetailsIntoDatabase(orderId, orderedFoods);
             try {
@@ -199,9 +207,53 @@ public class FoodController implements Initializable {
             } catch (Exception e) {
                 System.out.println("Failed to send message: " + e.getMessage());
             }
+            clearCartAndShowSuccessAlert();
         } else {
-            System.out.println("Failed to create order.");
+            showAlert(Alert.AlertType.ERROR, "Order Failed", "Could not process your order.");
         }
+    }
+
+    private boolean checkStockAvailability() {
+        String sql = "SELECT quantity FROM FOODS WHERE food_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (Map.Entry<Food, Integer> entry : extractOrderedFoods().entrySet()) {
+                Food food = entry.getKey();
+                int orderedQuantity = entry.getValue();
+
+                stmt.setInt(1, food.getId());
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    int availableQuantity = rs.getInt("quantity");
+                    if (availableQuantity < orderedQuantity) {
+                        showAlert(Alert.AlertType.ERROR, "Insufficient Stock",
+                                "Not enough stock for " + food.getName() + ". Available: " + availableQuantity);
+                        return false;
+                    }
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Stock Error", "Food item not found in database.");
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+
+    private void clearCartAndShowSuccessAlert() {
+        paymentItems.getChildren().clear();
+        total = 0.0;
+        totalLabel.setText("Total: " + CURRENCY + String.format("%.2f", total));
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Notification");
+        alert.setHeaderText(null);
+        alert.setContentText("Order successful, please wait!");
+        alert.showAndWait();
     }
 
     private Map<Food, Integer> extractOrderedFoods() {
@@ -259,23 +311,65 @@ public class FoodController implements Initializable {
     }
 
     private void insertOrderDetailsIntoDatabase(int orderId, Map<Food, Integer> orderedFoods) {
-        String sql = "INSERT INTO order_details (order_id, food_id, quantity, price, total_price, discount) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            for (Map.Entry<Food, Integer> entry : orderedFoods.entrySet()) {
-                Food food = entry.getKey();
-                int quantity = entry.getValue();
-                double totalPrice = quantity * food.getPrice();
-                stmt.setInt(1, orderId);
-                stmt.setInt(2, food.getId());
-                stmt.setInt(3, quantity);
-                stmt.setDouble(4, food.getPrice());
-                stmt.setDouble(5, totalPrice);
-                stmt.setDouble(6, 0.0);
-                stmt.executeUpdate();
+        String sqlOrderDetails = "INSERT INTO order_details (order_id, food_id, quantity, price, total_price, discount) VALUES (?, ?, ?, ?, ?, ?)";
+        String sqlUpdateFood = "UPDATE FOODS SET quantity = quantity - ? WHERE food_id = ? AND quantity >= ?";
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmtOrderDetails = conn.prepareStatement(sqlOrderDetails);
+                 PreparedStatement stmtUpdateFood = conn.prepareStatement(sqlUpdateFood)) {
+
+                for (Map.Entry<Food, Integer> entry : orderedFoods.entrySet()) {
+                    Food food = entry.getKey();
+                    int quantity = entry.getValue();
+                    double totalPrice = quantity * food.getPrice();
+
+                    stmtOrderDetails.setInt(1, orderId);
+                    stmtOrderDetails.setInt(2, food.getId());
+                    stmtOrderDetails.setInt(3, quantity);
+                    stmtOrderDetails.setDouble(4, food.getPrice());
+                    stmtOrderDetails.setDouble(5, totalPrice);
+                    stmtOrderDetails.setDouble(6, 0.0);
+                    stmtOrderDetails.executeUpdate();
+
+                    stmtUpdateFood.setInt(1, quantity);
+                    stmtUpdateFood.setInt(2, food.getId());
+                    stmtUpdateFood.setInt(3, quantity);
+                    int affectedRows = stmtUpdateFood.executeUpdate();
+
+                    if (affectedRows == 0) {
+                        conn.rollback();
+                        showAlert(Alert.AlertType.ERROR, "Order Failed", "Not enough stock for " + food.getName());
+                        return;
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            } finally {
+                conn.setAutoCommit(true);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+
+    @FXML
+    private void handleSearch() {
+        String keyword = searchField.getText().trim().toLowerCase();
+            List<Food> filteredFoods = foods.stream()
+                    .filter(food -> food.getName().toLowerCase().contains(keyword))
+                    .toList();
+            populateFoodGrid(filteredFoods);
     }
 }

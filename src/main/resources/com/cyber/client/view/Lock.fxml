@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyber.client.controller.LockScreenController">
+    <ImageView fx:id="backgroundImage" fitHeight="1080" fitWidth="1920" preserveRatio="true" style="-fx-opacity: 0.5;">
+      <image>
+         <Image url="@../assets/lock.jpg" />
+      </image></ImageView>
+    <StackPane>
+        <Label style="-fx-text-fill: white; -fx-font-size: 30px; -fx-font-weight: bold; -fx-alignment: center;" text="THIS MACHINE IS LOCKED CONTACT OWNER TO UNLOCK IT" wrapText="true" />
+    </StackPane>
+
+</StackPane>

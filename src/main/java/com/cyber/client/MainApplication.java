@@ -1,6 +1,5 @@
 package com.cyber.client;
 
-import com.cyber.client.client.ClientStatus;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,18 +13,14 @@ import java.util.Objects;
 public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-
-        new Thread(ClientStatus::sendOnlineStatus).start();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cyber/client/view/Login.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cyber/client/view/LoginRegister.fxml"));
         Image logo = new Image(Objects.requireNonNull(getClass().getResource("/com/cyber/client/assets/logo.jpg")).toExternalForm());
         Scene scene = new Scene(fxmlLoader.load());
         stage.getIcons().add(logo);
         stage.setTitle("Cyber Management");
         stage.setScene(scene);
-
         stage.setFullScreen(true);
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-        stage.setOnCloseRequest(event -> ClientStatus.sendOfflineStatus());
         stage.show();
     }
 
