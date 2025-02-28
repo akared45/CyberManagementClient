@@ -1,6 +1,7 @@
 package com.cyber.client;
 
 import javafx.application.Application;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -21,6 +22,7 @@ public class MainApplication extends Application {
         stage.setScene(scene);
         stage.setFullScreen(true);
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        stage.setOnCloseRequest(Event::consume);
         stage.show();
     }
 

@@ -195,7 +195,9 @@ public class UserDashboardController {
             stage.setScene(scene);
             stage.setTitle("Cyber Management");
             stage.setFullScreen(true);
+            stage.setFullScreenExitHint("");
             stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+            stage.setOnCloseRequest(event -> event.consume());
             ClientStatus.sendOfflineStatus();
             loggedInUser = null;
             stage.show();
@@ -203,6 +205,7 @@ public class UserDashboardController {
             e.printStackTrace();
         }
     }
+
 
     private String formatTime(double seconds) {
         int minutes = (int) (seconds / 60);
@@ -217,7 +220,7 @@ public class UserDashboardController {
             alert.setHeaderText(null);
             alert.setContentText("Your time has expired! Please recharge to continue.");
             alert.show();
-            PauseTransition delay = new PauseTransition(javafx.util.Duration.millis(5000));
+            PauseTransition delay = new PauseTransition(javafx.util.Duration.millis(3000));
             delay.setOnFinished(event -> {
                 alert.close();
                 returnToLogin();
@@ -269,7 +272,7 @@ public class UserDashboardController {
 
             endSession(userId);
             ClientStatus.sendOfflineStatus();
-            loadLoginScreen();
+            returnToLogin();
         } else {
             System.out.println("⚠️ No logged-in user. Logout skipped.");
         }
@@ -293,20 +296,6 @@ public class UserDashboardController {
                 System.out.println("✅ Session ended: User " + userId);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadLoginScreen() {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/cyber/client/view/LoginRegister.fxml"));
-            Parent root = fxmlLoader.load();
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.show();
-        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -25,12 +25,15 @@
                 <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <PasswordField fx:id="passwordField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                <HBox spacing="15" alignment="CENTER" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                <Label fx:id="statusLabelLogin" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: red;"/>
+
+                <HBox spacing="15" alignment="CENTER" GridPane.rowIndex="3" GridPane.columnIndex="1">
                     <Button text="Login" onAction="#handleLogin"/>
                     <Button text="Register" onAction="#switchToRegister"/>
                 </HBox>
             </GridPane>
         </VBox>
+
 
         <VBox fx:id="registerVBox" alignment="CENTER" spacing="20" visible="false">
             <Label text="Register Account" styleClass="title-label"/>
@@ -41,7 +44,9 @@
                 <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <PasswordField fx:id="registerPasswordField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                <HBox spacing="15" alignment="CENTER" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                <Label fx:id="statusLabelRegister" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: red;"/>
+
+                <HBox spacing="15" alignment="CENTER" GridPane.rowIndex="3" GridPane.columnIndex="1">
                     <Button text="Back to Login" onAction="#handleBackToLogin"/>
                     <Button text="Register" onAction="#handleRegister"/>
                 </HBox>
